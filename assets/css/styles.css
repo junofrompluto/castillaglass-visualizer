@@ -23,6 +23,7 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }   /* don't let component display rules override hidden */
 html, body { height: 100%; }
 body { font-family: var(--font-body); background: var(--bg); color: var(--ink); -webkit-text-size-adjust: 100%; }
 img { display: block; max-width: 100%; }
@@ -87,6 +88,31 @@ h2, h3 { font-family: var(--font); font-weight: 700; }
 .samples span { color: var(--muted); font-size: 0.82rem; }
 .sample { font-family: var(--font-body); font-weight: 600; font-size: 0.82rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 0.45rem 0.9rem; cursor: pointer; transition: 0.2s; }
 .sample:hover { border-color: var(--brand-2); transform: translateY(-2px); }
+
+/* ---------- address input ---------- */
+.addr { display: flex; align-items: center; gap: 0.5rem; background: var(--surface); border: 1.5px solid var(--line); border-radius: 999px; padding: 0.35rem 0.4rem 0.35rem 1rem; max-width: 460px; margin: 0 auto; }
+.addr:focus-within { border-color: var(--brand); }
+.addr__icon { color: var(--brand-2); }
+.addr input { flex: 1; background: none; border: 0; outline: none; color: var(--ink); font-family: var(--font-body); font-size: 0.95rem; min-width: 0; }
+.addr input::placeholder { color: var(--muted); }
+.addr__hint { color: var(--muted); font-size: 0.8rem; margin-top: 0.6rem; }
+.or { display: flex; align-items: center; gap: 0.8rem; color: var(--muted); font-size: 0.8rem; margin: 1.2rem auto; max-width: 280px; }
+.or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+/* google autocomplete dropdown on dark bg */
+.pac-container { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin-top: 4px; box-shadow: var(--shadow); font-family: var(--font-body); }
+.pac-item { color: var(--muted); border-top-color: var(--line); padding: 6px 10px; }
+.pac-item:hover, .pac-item-selected { background: var(--surface-2); }
+.pac-item-query, .pac-matched { color: var(--ink); }
+.pac-icon { display: none; }
+
+/* ---------- location (maps) view ---------- */
+.loc { position: absolute; inset: 0; z-index: 15; background: var(--bg-2); }
+.loc__view { position: absolute; inset: 0 0 56px 0; }
+.loc__view--3d { z-index: 2; }
+.loc__view gmp-map-3d { width: 100%; height: 100%; }
+.loc__bar { position: absolute; left: 0; right: 0; bottom: 0; height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; padding: 0 12px; background: rgba(10, 10, 11, 0.92); border-top: 1px solid var(--line); z-index: 3; }
+.loc__addr { color: var(--muted); font-size: 0.82rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.loc__btns { display: flex; gap: 0.45rem; flex: none; }
 
 /* ---------- glass overlay ---------- */
 .glass-layer { position: absolute; inset: 0; z-index: 20; pointer-events: none; }

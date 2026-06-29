@@ -9,7 +9,10 @@ free quote.
 
 ## What it does
 
-1. **Upload a photo** of your space (or pick a sample) — drag-and-drop works too.
+1. **Enter an address** → pulls the building from **Google Maps** (interactive
+   Street View + an optional **photorealistic 3D model** of the location), and
+   "📸 Use this view" loads it straight into the editor. *Or* **upload a photo**
+   (or pick a sample) — drag-and-drop works too.
 2. **Pick a project** — Glass Railing · Frameless Shower · Impact Window · Storefront.
 3. **Style it** — glass type (Clear / Low-iron / Frosted / Tinted) and hardware
    finish (Chrome / Matte Black / Brushed Nickel / Gold).
@@ -34,6 +37,28 @@ castillaglass-modeler/
 ├── netlify/functions/render.js   # optional Gemini "Nano Banana" renderer
 └── netlify.toml
 ```
+
+## Enable Google Maps (address → Street View / 3D)
+
+The address lookup, Street View, and 3D location view use **Google Maps
+Platform**. You need a key with these APIs enabled: **Maps JavaScript API,
+Places API, Street View (JS + Static), Map Tiles API** (for 3D). Billing must be
+on (Google's $200/mo free credit covers light use).
+
+Two places use it (a clean setup uses two keys, but one unrestricted key works):
+1. **Browser key** → paste into [`assets/js/config.js`](assets/js/config.js)
+   (`mapsBrowserKey`). Restrict it by **HTTP referrer** to your domain — then it's
+   safe to commit. Powers autocomplete, Street View, and the 3D map.
+2. **Server key** → Netlify env var **`MAPS_API_KEY`** (Street View Static API).
+   Used by the `/api/streetview` proxy so the editor gets a same-origin,
+   canvas-safe image (needed for download + AI render).
+
+> No Maps key? The address box just shows a hint and the **photo-upload flow
+> works exactly as before** — nothing breaks.
+
+> **3D model:** uses Google's Photorealistic 3D Map element (alpha). If it isn't
+> available for the key/area, the “🧊 3D model” button falls back to opening the
+> location in Google Maps' 3D view.
 
 ## Optional: enable photoreal AI rendering (Gemini “Nano Banana”)
 

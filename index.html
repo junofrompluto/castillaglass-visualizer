@@ -35,11 +35,18 @@
           <div class="dropzone__inner">
             <div class="dropzone__icon">🏠✨</div>
             <h2>Imagine it done.</h2>
-            <p>Drop a photo of your home or business — or pick a sample — then add glass and see the result.</p>
-            <button class="btn btn--red btn--lg" id="uploadBtn">Upload a photo</button>
+            <p>Enter your address to pull up your building from Google Maps — or upload a photo — then add glass and see the result.</p>
+            <div class="addr">
+              <span class="addr__icon">📍</span>
+              <input type="text" id="addrInput" placeholder="Enter a property address…" autocomplete="off" />
+              <button class="btn btn--red" id="addrGo">Find</button>
+            </div>
+            <p class="addr__hint" id="addrHint" hidden></p>
+            <div class="or"><span>or</span></div>
+            <button class="btn btn--ghost" id="uploadBtn">⬆ Upload a photo</button>
             <input type="file" id="fileInput" accept="image/*" hidden />
             <div class="samples">
-              <span>or try a sample:</span>
+              <span>try a sample:</span>
               <button class="sample" data-sample="assets/img/samples/balcony.jpg" data-suggest="railing">Balcony</button>
               <button class="sample" data-sample="assets/img/samples/bathroom.jpg" data-suggest="shower">Bathroom</button>
               <button class="sample" data-sample="assets/img/samples/storefront.jpg" data-suggest="storefront">Storefront</button>
@@ -47,6 +54,21 @@
             </div>
           </div>
         </div>
+
+        <!-- Google Maps location view -->
+        <div class="loc" id="loc" hidden>
+          <div class="loc__view" id="locStreet"></div>
+          <div class="loc__view loc__view--3d" id="loc3d" hidden></div>
+          <div class="loc__bar">
+            <span class="loc__addr" id="locAddr"></span>
+            <div class="loc__btns">
+              <button class="btn btn--dark btn--sm" id="toggle3d">🧊 3D model</button>
+              <button class="btn btn--dark btn--sm" id="newAddr">↺ New address</button>
+              <button class="btn btn--red btn--sm" id="useView">📸 Use this view →</button>
+            </div>
+          </div>
+        </div>
+
         <img class="stage__photo" id="photo" alt="Your space" hidden />
         <div class="glass-layer" id="glassLayer"></div>
         <div class="stage__badge" id="compareBadge" hidden>BEFORE</div>
@@ -99,6 +121,7 @@
     <span>Visualizer mockups are illustrative — final look confirmed on a free site measure.</span>
   </footer>
 
+  <script src="assets/js/config.js"></script>
   <script src="assets/js/app.js" defer></script>
 </body>
 </html>

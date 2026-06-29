@@ -55,12 +55,19 @@
   function loadImage(src, suggest) {
     photo.onload = () => {
       dropzone.style.display = "none";
+      $("#loc").hidden = true;
       photo.hidden = false;
       stageHint.hidden = false;
       if (suggest && PRODUCTS[suggest]) state.product = suggest;
       buildPiece();
       enableControls(true);
       setActive(".chip[data-product]", "product", state.product);
+    };
+    photo.onerror = () => {
+      if (String(src).startsWith("/api/streetview")) {
+        showAddrHint("No Street View here (or MAPS_API_KEY isn't set in Netlify). Try another angle, a new address, or upload a photo.");
+        $("#loc").hidden = true; dropzone.style.display = "grid";
+      }
     };
     state.aiSrc = null;
     photo.src = src;
@@ -242,6 +249,100 @@
     } catch (err) {
       renderMsg.innerHTML = "Couldn’t reach the renderer. Your styled mockup still works — and you can send it for a quote.<br><br><button class='btn btn--ghost btn--sm' onclick=\"document.getElementById('renderOverlay').hidden=true\">Close</button>";
     }
+  });
+
+  /* ============================================================
+     Google Maps: address → Street View / 3D → editor canvas
+     ============================================================ */
+  const MAPS_KEY = (window.CG_CONFIG || {}).mapsBrowserKey || "";
+  const addrInput = $("#addrInput"), addrGo = $("#addrGo"), addrHint = $("#addrHint"),
+        locEl = $("#loc"), locStreet = $("#locStreet"), loc3d = $("#loc3d"),
+        locAddr = $("#locAddr");
+  let mapsReady = null, pano = null, map3dEl = null, geom = null, cur = null;
+
+  function bootstrapMaps(key) {
+    // Google's official inline loader (v=alpha enables the 3D Map element)
+    ((g) => { let h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); const d = b.maps || (b.maps = {}), r = new Set(), e = new URLSearchParams(), u = () => h || (h = new Promise(async (f, n) => { a = m.createElement("script"); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, (t) => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); m.head.append(a); })); d[l] ? console.warn(p + " only loads once.") : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)); })({ key, v: "alpha" });
+  }
+
+  async function initMaps() {
+    if (mapsReady) return mapsReady;
+    if (!MAPS_KEY) { showAddrHint("Add a Google Maps key (assets/js/config.js) to enable address lookup — or just upload a photo."); return null; }
+    mapsReady = (async () => {
+      bootstrapMaps(MAPS_KEY);
+      const [{ Autocomplete }, geometry] = await Promise.all([
+        google.maps.importLibrary("places"),
+        google.maps.importLibrary("geometry"),
+      ]);
+      geom = geometry;
+      const ac = new Autocomplete(addrInput, { fields: ["geometry", "formatted_address"], types: ["geocode"] });
+      ac.addListener("place_changed", () => {
+        const pl = ac.getPlace();
+        if (pl.geometry && pl.geometry.location)
+          onLocation(pl.geometry.location.lat(), pl.geometry.location.lng(), pl.formatted_address || addrInput.value);
+      });
+    })().catch((e) => { console.warn(e); showAddrHint("Couldn't load Google Maps — check the key & enabled APIs. Photo upload still works."); mapsReady = null; });
+    return mapsReady;
+  }
+  const showAddrHint = (t) => { addrHint.textContent = t; addrHint.hidden = false; };
+
+  addrInput.addEventListener("focus", initMaps, { once: true });
+  addrGo.addEventListener("click", async () => {
+    if (!MAPS_KEY) return showAddrHint("Add a Google Maps key (assets/js/config.js) to enable address lookup — or upload a photo.");
+    await initMaps();
+    if (!window.google) return;
+    const { Geocoder } = await google.maps.importLibrary("geocoding");
+    new Geocoder().geocode({ address: addrInput.value }, (res, status) => {
+      if (status === "OK" && res[0]) {
+        const L = res[0].geometry.location;
+        onLocation(L.lat(), L.lng(), res[0].formatted_address);
+      } else showAddrHint("Couldn't find that address — try the suggestions or upload a photo.");
+    });
+  });
+  addrInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); addrGo.click(); } });
+
+  async function onLocation(lat, lng, address) {
+    cur = { lat, lng, address };
+    locAddr.textContent = address;
+    dropzone.style.display = "none";
+    locEl.hidden = false; loc3d.hidden = true; map3dEl = null; loc3d.innerHTML = "";
+    const { StreetViewPanorama } = await google.maps.importLibrary("streetView");
+    pano = new StreetViewPanorama(locStreet, {
+      position: { lat, lng }, pov: { heading: 0, pitch: 5 }, zoom: 0.9,
+      motionTracking: false, addressControl: false, fullscreenControl: false,
+      enableCloseButton: false, showRoadLabels: false,
+    });
+    pano.addListener("position_changed", () => {
+      const pos = pano.getPosition();
+      if (pos && geom) pano.setPov({ heading: geom.spherical.computeHeading(pos, new google.maps.LatLng(lat, lng)), pitch: 5 });
+    });
+  }
+
+  $("#newAddr").addEventListener("click", () => { locEl.hidden = true; dropzone.style.display = "grid"; addrInput.value = ""; addrHint.hidden = true; });
+
+  $("#toggle3d").addEventListener("click", async () => {
+    if (!loc3d.hidden) { loc3d.hidden = true; return; }
+    try {
+      if (!map3dEl) {
+        const { Map3DElement } = await google.maps.importLibrary("maps3d");
+        map3dEl = new Map3DElement({ center: { lat: cur.lat, lng: cur.lng, altitude: 30 }, range: 240, tilt: 64, heading: 30 });
+        loc3d.appendChild(map3dEl);
+      }
+      loc3d.hidden = false;
+    } catch (e) {
+      console.warn(e);
+      window.open(`https://www.google.com/maps/@${cur.lat},${cur.lng},90a,60y,45t/data=!3m1!1e3`, "_blank");
+    }
+  });
+
+  $("#useView").addEventListener("click", () => {
+    if (!pano) return;
+    const pos = pano.getPosition(), pov = pano.getPov() || { heading: 0, pitch: 0 };
+    const z = pano.getZoom() || 1;
+    const fov = Math.max(20, Math.min(110, 180 / Math.pow(2, z)));
+    const lat = (pos && pos.lat()) || cur.lat, lng = (pos && pos.lng()) || cur.lng;
+    const url = `/api/streetview?lat=${lat}&lng=${lng}&heading=${pov.heading.toFixed(1)}&pitch=${pov.pitch.toFixed(1)}&fov=${fov.toFixed(0)}&size=1024x768`;
+    loadImage(url);   // same-origin proxy → canvas-safe for download + AI
   });
 
   /* ----- quote ----- */
