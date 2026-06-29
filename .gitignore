@@ -1,0 +1,14 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+
+# Secrets / build
+.env
+.env.*
+.netlify/
+node_modules/
+dist/
+*.zip

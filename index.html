@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0a0b" />
+  <title>Castilla Glass — Imagine It Visualizer</title>
+  <meta name="description" content="See it before we build it. Upload a photo of your home or business, drop in glass railings, shower doors, impact windows or storefronts, and visualize the finished look — then get it quoted." />
+  <meta property="og:title" content="Castilla Glass — Imagine It Visualizer" />
+  <meta property="og:description" content="Visualize new glass on your own home or business, then get a free quote." />
+  <meta property="og:image" content="assets/img/og.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="icon" type="image/png" href="assets/img/logo.png" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="https://castillaglass.com">
+      <img src="assets/img/logo.png" alt="Castilla Glass" />
+      <span>Castilla<strong>Glass</strong> · Visualizer</span>
+    </a>
+    <div class="topbar__actions">
+      <a class="link" href="tel:+13052190308">📞 (305) 219-0308</a>
+      <a class="btn btn--ghost btn--sm" href="https://castillaglass.com">← Main site</a>
+    </div>
+  </header>
+
+  <main class="app">
+    <!-- ===== STAGE ===== -->
+    <section class="stage-wrap">
+      <div class="stage" id="stage">
+        <div class="dropzone" id="dropzone">
+          <div class="dropzone__inner">
+            <div class="dropzone__icon">🏠✨</div>
+            <h2>Imagine it done.</h2>
+            <p>Drop a photo of your home or business — or pick a sample — then add glass and see the result.</p>
+            <button class="btn btn--red btn--lg" id="uploadBtn">Upload a photo</button>
+            <input type="file" id="fileInput" accept="image/*" hidden />
+            <div class="samples">
+              <span>or try a sample:</span>
+              <button class="sample" data-sample="assets/img/samples/balcony.jpg" data-suggest="railing">Balcony</button>
+              <button class="sample" data-sample="assets/img/samples/bathroom.jpg" data-suggest="shower">Bathroom</button>
+              <button class="sample" data-sample="assets/img/samples/storefront.jpg" data-suggest="storefront">Storefront</button>
+              <button class="sample" data-sample="assets/img/samples/window.jpg" data-suggest="window">Window</button>
+            </div>
+          </div>
+        </div>
+        <img class="stage__photo" id="photo" alt="Your space" hidden />
+        <div class="glass-layer" id="glassLayer"></div>
+        <div class="stage__badge" id="compareBadge" hidden>BEFORE</div>
+        <div class="render-overlay" id="renderOverlay" hidden>
+          <div class="spinner"></div>
+          <p id="renderMsg">Rendering your photoreal preview…</p>
+        </div>
+      </div>
+      <div class="stage__hint" id="stageHint" hidden>Drag the glass to place it · pull the corner to resize</div>
+    </section>
+
+    <!-- ===== CONTROLS ===== -->
+    <aside class="panel">
+      <div class="panel__group">
+        <h3>1 · Project</h3>
+        <div class="chips" id="productChips"><!-- injected --></div>
+      </div>
+
+      <div class="panel__group">
+        <h3>2 · Glass</h3>
+        <div class="chips chips--sm" id="glassChips"><!-- injected --></div>
+      </div>
+
+      <div class="panel__group">
+        <h3>3 · Hardware finish</h3>
+        <div class="chips chips--sm" id="finishChips"><!-- injected --></div>
+      </div>
+
+      <div class="panel__group">
+        <h3>4 · Preview</h3>
+        <div class="btn-row">
+          <button class="btn btn--dark" id="compareBtn" disabled>👁 Hold to compare</button>
+          <button class="btn btn--dark" id="resetBtn" disabled>↺ Reset</button>
+        </div>
+        <button class="btn btn--red btn--lg btn--block" id="renderBtn" disabled>✨ Render photoreal (AI)</button>
+        <p class="hint" id="aiHint">Free preview shows a styled mockup. “Render photoreal” turns it into an AI-generated image of <em>your</em> space.</p>
+      </div>
+
+      <div class="panel__group panel__group--cta">
+        <h3>5 · Make it real</h3>
+        <p class="hint">Love it? Send your design to Daniel and get a free, no-pressure quote.</p>
+        <button class="btn btn--red btn--lg btn--block" id="quoteBtn">⚡ Get this quoted</button>
+        <a class="btn btn--ghost btn--block" id="downloadBtn" download="castilla-glass-design.png">⬇ Download image</a>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="foot">
+    <span>Castilla Glass · Miami, FL · <a href="tel:+13052190308">(305) 219-0308</a> · <a href="mailto:Dcastilla89@yahoo.com">Dcastilla89@yahoo.com</a></span>
+    <span>Visualizer mockups are illustrative — final look confirmed on a free site measure.</span>
+  </footer>
+
+  <script src="assets/js/app.js" defer></script>
+</body>
+</html>

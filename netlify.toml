@@ -1,0 +1,20 @@
+# Castilla Glass — Imagine It Visualizer
+# Static site + one optional serverless function for AI rendering.
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
+  command = ""
+
+# Front-end calls /api/render → the Gemini function
+[[redirects]]
+  from = "/api/render"
+  to = "/.netlify/functions/render"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
