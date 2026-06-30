@@ -76,6 +76,27 @@ To switch it on:
 > Model names evolve — if a render errors, set `GEMINI_MODEL` to the current
 > image-capable Gemini model from Google AI Studio.
 
+## Lock the site behind a login (username + password)
+
+The whole app sits behind a one-user login, enforced by a Netlify **Edge
+Function** ([`netlify/edge-functions/gate.js`](netlify/edge-functions/gate.js)).
+Set the credentials in **Netlify → Site settings → Environment variables**:
+
+| Variable | Value |
+|---|---|
+| `VIS_USER` | the username you want |
+| `VIS_PASS` | the password you want |
+
+Redeploy and the site shows a branded sign-in screen; a cookie remembers the
+visitor for 14 days. Change either value anytime in Netlify (then redeploy) —
+old sessions are invalidated automatically. Visit `/__logout` to sign out.
+
+> Credentials live only in Netlify env vars — they're **never** sent to the
+> browser. If `VIS_USER`/`VIS_PASS` aren't set, the gate stays open (public) so
+> a fresh deploy can't lock you out. The login only runs on Netlify (Edge
+> runtime), so the plain `python3` local server below is **not** gated — use
+> `netlify dev` to test the login locally.
+
 ## Run locally
 
 ```bash
